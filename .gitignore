@@ -51,3 +51,13 @@ Icon\r
 
 # Temporary or cache files
 $RECYCLE.BIN/
+
+#misc
+.venv/
+__pycache__/
+*.pyc
+.env
+.env.*
+!.env.example
+chroma_data/
+.idea/
