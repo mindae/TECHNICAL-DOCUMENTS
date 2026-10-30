@@ -1,15 +1,15 @@
 # Git & GitHub — Enterprise Engineering Masterclass
 
 > **Learning notes and hands-on lab journal**  
-> **Progress:** Phase 1 (Essentials), through Lesson 6B: feature branches, remote comparisons, and PR preparation.  
-> **Last updated:** 28 October 2026  
+> **Progress:** Phase 1 (Essentials), Lessons 1–9 completed; Lesson 10 (tags/releases) pending.  
+> **Last updated:** 30 October 2026  
 > **Separate from:** `GITHUB-COPILOT/README.md`
 
 ## Why this handbook exists
 
 This is a practical, three-phase learning programme that connects **Git commands**, **GitHub collaboration**, **releases**, **CI/CD**, **production hotfixes**, and **enterprise safety practices**. We learn with both a terminal and IntelliJ IDEA, while experimenting in a disposable repository rather than the working microservices repositories.
 
-**Teaching convention:** Explain a concept → perform a hands-on scenario → inspect actual output → answer doubts → move to the next topic **only when ready**. Knowledge-check questions must not have a preselected answer.
+**Teaching convention:** State **Do / Don’t / Stop at** before commands → explain concept → hands-on exercise → inspect actual output → resolve doubts → move on **only when ready**. Knowledge-check questions must start with no preselected option and reveal answers only after submission.
 
 ## Contents
 
@@ -26,6 +26,10 @@ This is a practical, three-phase learning programme that connects **Git commands
 11. [Enterprise safety rules and IntelliJ mapping](#11-enterprise-safety-and-intellij-cheat-sheet)
 12. [Next hands-on checkpoint](#12-current-checkpoint-and-next-steps)
 13. [Quick command reference](#13-command-reference)
+14. [Lesson 7: PR merge and fast-forward](#14-lesson-7-pr-merge-and-fast-forward-sync)
+15. [Lesson 8: GitHub Actions, failure recovery, and rulesets](#15-lesson-8-github-actions-ci-and-rulesets)
+16. [Lesson 9: Local and remote branch cleanup](#16-lesson-9-local-and-remote-branch-cleanup)
+17. [Concept clarification: fetch, reachability, merge](#17-key-concepts-clarified)
 
 ---
 
@@ -62,7 +66,7 @@ This is a practical, three-phase learning programme that connects **Git commands
 - **Remote:** <https://github.com/mindae/git-enterprise-lab>
 - **Local default branch:** `main`
 - **Remote name:** `origin`
-- **Practice feature branches:** `feature/payment-validation` and `feature/pay-104-validation` (lowercase `pay`, as actually used).
+- **Practice branches:** `feature/payment-validation`, `feature/pay-104-validation` (local and remote branch later deleted), and `feature/pay-106-ci-check`.
 - We edited files on **GitHub's website** to simulate a second developer while using **Terminal/IntelliJ on Mac** as the first developer.
 - We corrected a remote from `http://github.com/...` to `https://github.com/...` using `git remote set-url`.
 
@@ -79,16 +83,20 @@ This is a practical, three-phase learning programme that connects **Git commands
 | `23a7f89` | Merge remote-tracking branch 'origin/main' | Two-parent merge; later pushed to GitHub `main` |
 | `32a4cf4` | feat(payment): validate transaction currency | PAY-104 feature commit |
 | `24fa1c0` | feat(payment): add PAY-105 transaction limits | GitHub `main` advanced independently of PAY-104 |
+| `037ce0d` | Merge pull request #1 from mindae/feature/pay-104-validation | PR #1 merge commit; two parents |
+| `07f1727` | ci: add payment documentation validation | Added `.github/workflows/pr-check.yml` |
+| `580e92e` | test(ci): simulate failing PR validation | Intentional failing GitHub Actions run |
+| `07d6a40` | fix(ci): restore passing PR validation | Restored passing workflow, still on PR #2 feature branch |
+| `a8174ae` | Merge pull request #2 from mindae/feature/pay-106-ci-check | PR #2 merge commit; latest confirmed `main` |
 
-**Last confirmed local state (28 October):**
+**Last confirmed local state (30 October):**
 
-```text
-* feature/pay-104-validation 32a4cf4 [origin/feature/pay-104-validation]
-  feature/payment-validation 9dbff7f
-  main                       23a7f89 [origin/main: behind 1]
-```
-
-At that checkpoint, `origin/main` was at `24fa1c0`, and the PAY-104 branch (local and remote) was at `32a4cf4`. The feature and the remote main had each gained one exclusive commit. **PR creation/open status was not confirmed in the shared terminal output.** Do not assume the PR is merged.
+- `main`, `origin/main` and `origin/HEAD` point to `a8174ae` (PR #2 merged).
+- PAY-104 local branch was deleted with `git branch -d`; remote branch was subsequently deleted with `git push origin --delete feature/pay-104-validation`. The commit `32a4cf4` **remains reachable from `main`**.
+- `feature/pay-106-ci-check` remains locally and on GitHub at `07d6a40`.
+- `feature/payment-validation` remains locally at `9dbff7f`.
+- The public lab repository has an active `protect-main-ci` ruleset targeting `main`, requiring PRs and the GitHub Actions `validate` status check, and disallowing force pushes and branch deletion.
+- **Next topic:** Lesson 10: tags, releases, release artifacts, and provenance. No release tags have yet been created in the lab.
 
 ## 3. Lesson 1: Working tree, staging, and commits
 
@@ -480,22 +488,13 @@ In a multi-repository IntelliJ workspace, always check **which Git root** an act
 
 ## 12. Current checkpoint and next steps
 
-**Checkpoint:** Phase 1, Lesson 6B; we have **not yet completed the PR merge**.
+**Completed:** Phase 1 Lessons 1–9, including two merged PRs, running CI, an intentional failed check and repair, main-branch ruleset setup, fast-forward synchronization, and deletion of the PAY-104 local and remote branch.
 
-What to do **before moving to a new lesson**:
+**Current repository:** `main` = `origin/main` = `a8174ae` as of the latest shared terminal output. No release tags have yet been created.
 
-1. Verify the three-dot diff:
-   ```bash
-   git fetch origin
-   git diff --stat origin/main...feature/pay-104-validation
-   ```
-   Expected based on prior history: only `payment-validation.txt | 1 +`.
-2. Inspect the PAY-104 PR on GitHub. Confirm **whether a PR exists**, its **open status**, its proposed changes and any **merge-conflict/check** notices.
-3. Review and discuss any questions about `git log` versus `git diff`, remote tracking, or PR state.
-4. Once questions are resolved, practise PR review/merge (merge, squash, rebase options), fetch the updated `main`, and inspect the graph.
-5. Subsequent Phase 1 topics: branch protection, CI/status checks, tags, GitHub Releases, connection to deployable artifacts.
+**Next planned lesson (not yet practised):** Lesson 10 — Git tags vs branches, GitHub Releases, versioning, and how an immutable source commit becomes a build artifact. Then Phase 2 expands to release maintenance branches, backports, and emergency production hotfixes.
 
-**Lesson discipline:** Stop after each lab. Ask for doubts and await explicit confirmation before introducing a new lesson.
+**Procedure:** Start each lab with **Do / Don't / Stop at**; run only the stated steps; inspect output; ask about doubts before introducing the next topic.
 
 ## 13. Command reference
 
@@ -523,6 +522,13 @@ What to do **before moving to a new lesson**:
 | `git diff A...B` | Merge-base-to-B comparison, useful for PR changes |
 | `git merge origin/main` | Integrate fetched remote main into current branch |
 | `git show --no-patch --pretty=raw SHA` | Inspect commit metadata/parents |
+| `git merge-base --is-ancestor A B` | Check if A is reachable from B by following parent links; exit status 0=yes |
+| `git config --get-all remote.origin.fetch` | Inspect which remote refs a fetch tracks |
+| `git show origin/main:path/to/file` | Inspect fetched file content without checkout |
+| `git branch --merged main` | Find local branches whose tips are reachable from main |
+| `git branch --no-merged main` | Find branches not fully merged in main |
+| `git branch -d feature/name` | Safely remove a local branch reference if Git considers it merged |
+| `git push origin --delete feature/name` | Request deletion of branch on GitHub |
 
 ### Updating this README later
 
@@ -531,3 +537,174 @@ Append subsequent lessons with the **actual commits, branches, merge strategies,
 ---
 
 *This is a personal training reference. The repository and commit data above reflect our exercises as shared in chat, not a live verification of GitHub's current state.*
+
+
+## 14. Lesson 7: PR merge and fast-forward sync
+
+### Hands-on PR #1: PAY-104 currency validation
+
+- Feature: `feature/pay-104-validation`, commit `32a4cf4`, adding `payment-validation.txt`.
+- Remote `main` independently gained PAY-105 commit `24fa1c0`, adding `payment-limits.txt`.
+- GitHub PR #1 merged using **Create a merge commit**: `037ce0d`.
+- After `git fetch origin`, local `main` was at `23a7f89`, while `origin/main` was at `037ce0d`. Local Git reported **behind 3** because the history added PAY-105, PAY-104, and the PR merge commit. A PR is not necessarily one commit.
+
+```bash
+git fetch origin
+git log --oneline --graph --decorate --all -10
+git switch main
+git status -sb            # [behind 3] in our actual exercise
+git pull --ff-only        # Updating 23a7f89..037ce0d, Fast-forward
+git status -sb            # synchronized
+```
+
+**Fast-forward rule:** The current branch tip must be reachable by following parent links backwards from the proposed target commit. It is *not enough* merely to have a common ancestor. A fast-forward moves a branch pointer, creating no commit, **even if the history it moves across already contains merge commits**.
+
+```bash
+git merge-base --is-ancestor 23a7f89 037ce0d
+echo $?      # 0: yes
+git merge-base --is-ancestor 037ce0d 23a7f89
+echo $?      # 1: no
+```
+
+**Merge vs pull:** `git merge origin/main` integrates the **already-fetched** remote-tracking history. With a behind-only branch, it normally fast-forwards; on divergent branches, it generally creates a merge commit, potentially after conflict resolution. `git pull --ff-only` fetches first, then **refuses** to integrate diverged history through a merge commit or rebase. We used `git merge origin/main` for the divergent PAY-103 experiment (`23a7f89`) but `git pull --ff-only` after PR merges when local `main` was simply behind.
+
+## 15. Lesson 8: GitHub Actions CI and rulesets
+
+### Hands-on PR #2: CI validation
+
+Created `feature/pay-106-ci-check` with `.github/workflows/pr-check.yml`:
+
+```yaml
+name: PR Validation
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Validate payment documentation
+        run: |
+          test -s release.txt
+          test -s payment.txt
+          test -s payment-validation.txt
+          echo "All payment documentation checks passed"
+```
+
+- `07f1727` introduced the workflow; GitHub Actions job **`validate` passed** (about 3 seconds in screenshot).
+- `580e92e` deliberately added `test -s nonexistent-file.txt`; CI **failed** with `Process completed with exit code 1`. The `test` builtin reports a false condition through its exit code without necessarily printing a descriptive error.
+- `07d6a40` removed the failing line; pushed to the existing feature branch; the latest PR check **passed**.
+- GitHub PR #2 merged with a merge commit `a8174ae`; all three feature commits plus the merge commit became reachable from `main`. Local `main` was **behind 4** until `git pull --ff-only` advanced from `037ce0d` to `a8174ae`.
+
+**More diagnostic CI failure message:**
+
+```bash
+if ! test -s required-file.txt; then
+  echo "::error::required-file.txt is missing or empty"
+  exit 1
+fi
+```
+
+### GitHub branch ruleset
+
+Created GitHub **Settings → Rules → Rulesets** → `protect-main-ci` with:
+
+| Control | Lab setting |
+|---|---|
+| Enforcement | Active |
+| Target | Default branch `main` |
+| Require PR before merging | Enabled |
+| Required status checks | Enabled; explicitly selected `validate` from GitHub Actions |
+| Block force pushes | Enabled |
+| Restrict branch deletions | Enabled |
+| Require up-to-date branch before merging | Not enabled |
+| Bypass list | Empty |
+
+**Critical lesson:** Merely running GitHub Actions is different from **requiring** it as a status check. The `validate` job had to be explicitly selected inside the ruleset's additional settings. We verified the final ruleset and a successful merge, **but did not test an attempted PR merge while that rule was active and the check was failing**. Do not claim that experiment was performed.
+
+**CI, PR approval, merge, release, and deployment are separate stages.** The source-branch merge does not by itself prove a production artifact was deployed.
+
+## 16. Lesson 9: Local and remote branch cleanup
+
+At `main = a8174ae`, Git showed all three local feature branches as merged:
+
+```bash
+git branch -vv
+git branch --merged main
+git branch --no-merged main   # no output in our exercise
+```
+
+We deleted **only** the old PAY-104 local branch:
+
+```bash
+git branch -d feature/pay-104-validation
+# Deleted branch feature/pay-104-validation (was 32a4cf4).
+```
+
+The graph still showed `32a4cf4 (origin/feature/pay-104-validation)` because the *remote-tracking* branch reference remained. We then ran:
+
+```bash
+git push origin --delete feature/pay-104-validation
+# [deleted] feature/pay-104-validation
+git log --oneline --graph --decorate -10
+git show --stat 32a4cf4
+```
+
+The `origin/feature/pay-104-validation` label disappeared but commit `32a4cf4` **remained visible and inspectable**, as it is an ancestor of PR #1's merge commit, which remains reachable from `main`.
+
+**Three different things:**
+
+1. Local branch `feature/pay-104-validation` — deleted with `git branch -d`.
+2. GitHub remote branch and local `origin/feature/pay-104-validation` tracking ref — removed by successful remote deletion.
+3. Commit `32a4cf4` — retained in `main` ancestry; deleting branch labels does not erase that history.
+
+Do not automatically remove release/maintenance branches that may still be needed for hotfixes. `git branch -D` force-deletes the local ref, bypassing the merge-safety check; investigate before using it. Squash-merged PRs may have changes integrated but original feature commit SHAs not reachable from `main`, causing `-d` to refuse.
+
+## 17. Key concepts clarified
+
+### What `git fetch origin` actually downloads
+
+`fetch` downloads required Git objects (**commits**, **trees**, **blobs/file content**) into the repository's object store and updates remote-tracking references; it does **not** check files out into the working tree or advance the checked-out local branch. You can examine a fetched file without switching:
+
+```bash
+git show origin/main:remote-feature-103.txt
+```
+
+In an ordinary clone, `git fetch origin` normally fetches all branches covered by the configured refspec, **regardless of the currently checked-out branch**. Check with:
+
+```bash
+git config --get-all remote.origin.fetch
+# Typical: +refs/heads/*:refs/remotes/origin/*
+git branch -r
+```
+
+`git fetch origin main` explicitly fetches `main` and records it in `FETCH_HEAD`; in a typical clone it also updates `origin/main`. Shallow/partial clones may differ in which Git objects are initially obtained.
+
+### Commit reachability
+
+A commit is **reachable** from a starting commit if Git can arrive at it by following zero or more **parent** links (backward, not forward). A merge commit has two parents and reaches the history from both sides. `git log A..B` shows commits reachable from B but not from A. Reachability explains fast-forward eligibility and why merged commits remain after feature branches are deleted.
+
+### Difference between `git log` and `git diff` dots
+
+```bash
+# Commit sets: right minus left
+git log --oneline feature/pay-104-validation..origin/main
+
+# Symmetric difference: unique commits on either side
+git log --oneline --left-right origin/main...feature/pay-104-validation
+
+# Snapshot of B versus snapshot of A
+git diff A..B
+
+# Changes introduced on B since the common ancestor with A
+git diff A...B
+```
+
+In the earlier PAY-104/PAY-105 divergence, `git diff origin/main..feature/pay-104-validation` showed a PAY-105 file removal *and* a PAY-104 file addition, because it compared branch-tip snapshots. The three-dot PR-style diff showed **only** the PAY-104 addition.
+
+---
+
+*Training journal based on observed outputs in the conversation. Release tags, production deployments, cherry-pick hotfixes, and rollback simulations remain future exercises.*
