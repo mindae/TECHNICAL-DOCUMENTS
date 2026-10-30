@@ -1,7 +1,7 @@
 # Git & GitHub — Enterprise Engineering Masterclass
 
 > **Learning notes and hands-on lab journal**  
-> **Progress:** Phase 1 (Essentials), Lessons 1–9 completed; Lesson 10 (tags/releases) pending.  
+> **Progress:** **Phase 1 (Essentials), Lessons 1–10 completed.** Phase 2 (Intermediate) is next.  
 > **Last updated:** 30 October 2026  
 > **Separate from:** `GITHUB-COPILOT/README.md`
 
@@ -30,6 +30,8 @@ This is a practical, three-phase learning programme that connects **Git commands
 15. [Lesson 8: GitHub Actions, failure recovery, and rulesets](#15-lesson-8-github-actions-ci-and-rulesets)
 16. [Lesson 9: Local and remote branch cleanup](#16-lesson-9-local-and-remote-branch-cleanup)
 17. [Concept clarification: fetch, reachability, merge](#17-key-concepts-clarified)
+18. [Lesson 10: annotated tags and GitHub Releases](#18-lesson-10-annotated-tags-and-github-releases)
+19. [Phase 1 completion and Phase 2 starting point](#19-phase-1-completion-and-phase-2-starting-point)
 
 ---
 
@@ -96,7 +98,7 @@ This is a practical, three-phase learning programme that connects **Git commands
 - `feature/pay-106-ci-check` remains locally and on GitHub at `07d6a40`.
 - `feature/payment-validation` remains locally at `9dbff7f`.
 - The public lab repository has an active `protect-main-ci` ruleset targeting `main`, requiring PRs and the GitHub Actions `validate` status check, and disallowing force pushes and branch deletion.
-- **Next topic:** Lesson 10: tags, releases, release artifacts, and provenance. No release tags have yet been created in the lab.
+- **Release milestone:** annotated tag `v1.0.0` exists locally and on GitHub, identifies `a8174ae`; GitHub Release **v1.0.0 - Initial Release** has been published. No executable artifact built or deployed.
 
 ## 3. Lesson 1: Working tree, staging, and commits
 
@@ -488,11 +490,11 @@ In a multi-repository IntelliJ workspace, always check **which Git root** an act
 
 ## 12. Current checkpoint and next steps
 
-**Completed:** Phase 1 Lessons 1–9, including two merged PRs, running CI, an intentional failed check and repair, main-branch ruleset setup, fast-forward synchronization, and deletion of the PAY-104 local and remote branch.
+**Completed:** **Phase 1 Lessons 1–10**, including two merged PRs, CI failure/repair, protected `main`, fast-forward synchronization, branch cleanup, annotated tag `v1.0.0` and published GitHub Release.
 
-**Current repository:** `main` = `origin/main` = `a8174ae` as of the latest shared terminal output. No release tags have yet been created.
+**Current repository:** Last confirmed `main` = `origin/main` = `a8174ae`, and published annotated tag `v1.0.0` points to the same commit. Release published, **no production deployment**.
 
-**Next planned lesson (not yet practised):** Lesson 10 — Git tags vs branches, GitHub Releases, versioning, and how an immutable source commit becomes a build artifact. Then Phase 2 expands to release maintenance branches, backports, and emergency production hotfixes.
+**Next planned lesson (not yet practised):** **Phase 2** — trunk-based development, release/maintenance branches, version progression, backport/forward-port, cherry-pick, and simulated `v1.0.1` production hotfix while unreleased features remain on `main`.
 
 **Procedure:** Start each lab with **Do / Don't / Stop at**; run only the stated steps; inspect output; ask about doubts before introducing the next topic.
 
@@ -529,6 +531,12 @@ In a multi-repository IntelliJ workspace, always check **which Git root** an act
 | `git branch --no-merged main` | Find branches not fully merged in main |
 | `git branch -d feature/name` | Safely remove a local branch reference if Git considers it merged |
 | `git push origin --delete feature/name` | Request deletion of branch on GitHub |
+| `git tag -a v1.0.0 SHA -m "Release message"` | Create annotated tag at a specified commit |
+| `git tag -n` | List tags and annotation messages |
+| `git show --no-patch v1.0.0` | View annotated tag and target commit metadata |
+| `git rev-parse 'v1.0.0^{}'` | Peel annotated tag to its target commit |
+| `git push origin v1.0.0` | Publish one tag to remote |
+| `git ls-remote --tags origin 'v1.0.0*'` | Inspect remote tag object and peeled target |
 
 ### Updating this README later
 
@@ -707,4 +715,114 @@ In the earlier PAY-104/PAY-105 divergence, `git diff origin/main..feature/pay-10
 
 ---
 
-*Training journal based on observed outputs in the conversation. Release tags, production deployments, cherry-pick hotfixes, and rollback simulations remain future exercises.*
+*Training journal based on observed outputs in the conversation. Phase 1 tag and GitHub Release completed; production deployments, cherry-pick hotfixes, and rollback simulations remain future exercises.*
+
+
+## 18. Lesson 10: Annotated tags and GitHub Releases
+
+**Completed on 30 October 2026.** This section records what was actually done, distinguishing source tagging and release publication from building and deploying an application.
+
+### The four distinct entities
+
+| Entity | Example in our lab | What it means |
+|---|---|---|
+| Git commit | `a8174ae` | Immutable source snapshot (object ID) |
+| Git tag | `v1.0.0` | Human-readable release reference pointing, via an annotated tag object, to that commit |
+| GitHub Release | `v1.0.0 - Initial Release` | GitHub publication with notes and source archives |
+| Deployed artifact | **None** | A JAR/container/image digest would need a separate build and deployment process |
+
+**Release URL:** <https://github.com/mindae/git-enterprise-lab/releases/tag/v1.0.0>  
+**Tagged source SHA:** `a8174aedd9c48475cd079bde0a11c4e4f1adc59d`  
+**Annotated tag object SHA:** `e49f90198a89ea455dd3a420ab6698cfcf2734b5`
+
+### Part A — Create an annotated tag locally
+
+We first verified that `main` and `origin/main` were both at merge commit `a8174ae` (PR #2) and created the tag explicitly on that commit:
+
+```bash
+cd ~/IdeaProjects/git-enterprise-lab
+git switch main
+git status -sb
+git log -1 --oneline --decorate
+
+git tag -a v1.0.0 a8174ae -m "Release v1.0.0 - initial Git enterprise lab"
+
+git tag -n
+git show --no-patch v1.0.0
+git rev-parse 'v1.0.0^{}'
+git log --oneline --decorate -3
+```
+
+Observed:
+
+```text
+v1.0.0          Release v1.0.0 - initial Git enterprise lab
+a8174aedd9c48475cd079bde0a11c4e4f1adc59d
+a8174ae (HEAD -> main, tag: v1.0.0, origin/main, origin/HEAD) Merge pull request #2 ...
+```
+
+**Why two dates?** The commit was created earlier on 30 October; the annotated tag was created later. An annotated tag is a separate Git object containing tagger, message and timestamp. Creating the tag did not change the commit, working tree or branch tip.
+
+### Part B — Publish the Git tag to GitHub
+
+```bash
+git push origin v1.0.0
+# * [new tag] v1.0.0 -> v1.0.0
+
+git ls-remote --tags origin 'v1.0.0*'
+```
+
+Observed:
+
+```text
+e49f90198a89ea455dd3a420ab6698cfcf2734b5 refs/tags/v1.0.0
+a8174aedd9c48475cd079bde0a11c4e4f1adc59d refs/tags/v1.0.0^{}
+```
+
+There are **not two tags**. The first SHA refers to the annotated **tag object**, while `^{}` denotes the **peeled target commit**. `git rev-parse 'v1.0.0^{}'` gives the actual tagged commit.
+
+**Tag-push distinction:** `git push origin main` typically pushes the branch, not a new local tag; explicitly push the intended tag instead of automatically publishing all tags with `git push --tags`.
+
+**GitHub UI distinction:** GitHub's **Commits** list did not show `v1.0.0` adjacent to `a8174ae` as `git log --decorate` did. The **Tags** page did show `v1.0.0` pointing to `a8174ae`. This is a difference in presentation, not an error. `git branch -vv` does not list tags.
+
+### Part C — Publish the GitHub Release
+
+In GitHub, we opened **Releases → Draft a new release** and chose the **existing** `v1.0.0` tag (did not create a new tag).
+
+- **Release title:** `v1.0.0 - Initial Release`
+- **Release label:** Normal/latest release, **not** pre-release
+- **Release notes:** PAY-103 transaction note, PAY-104 currency validation note, PAY-105 transaction limits note, PAY-106 GitHub Actions PR-validation workflow; included validation, PR #1/#2, and `protect-main-ci` ruleset
+- **Source commit:** `a8174ae`
+- **Assets:** GitHub's auto-generated **Source code (zip)** and **Source code (tar.gz)**; no JAR, Docker image or uploaded binaries
+- **Deployment note:** Explicitly stated that this is a **simulated learning release**, with no real application built or deployed
+
+The user published the release and the GitHub screenshot showed `v1.0.0 - Initial Release` with a **Latest** label, the correct `a8174ae` SHA, published release notes and two source archives.
+
+### Critical distinctions and enterprise practice
+
+- A **branch** advances on new commits made while checked out; a release **tag** should remain anchored to the selected revision. Treat published release tags as immutable, even though Git technically permits retagging.
+- A GitHub Release **is not** proof of deployment. Source ZIP/TAR.GZ files are not compiled deployable artifacts.
+- A production deployment should identify the **exact built artifact** (e.g., image digest), its build/test provenance and the **source SHA/tag**. Deploying a tag alone is not a complete release process.
+- The `v1.0.0` tag becomes our **fixed baseline** for Phase 2: develop newer features on `main`, then patch only the `v1.0.0` release line as `v1.0.1` without accidentally including unfinished features.
+
+---
+
+## 19. Phase 1 completion and Phase 2 starting point
+
+**Phase 1 — Essentials: COMPLETE (Lessons 1–10).**
+
+What was actually exercised: initial Git repository and staging; selective commits and branch creation; GitHub remote and upstream; fetch and incoming/outgoing comparisons; diverged local/remote changes; rejected push and merge; PR #1; branch ancestry and `pull --ff-only`; PR #2; GitHub Actions success → intentional failure → repair; `protect-main-ci` ruleset requiring PR and `validate` status check; merged-branch cleanup; annotated tag and published GitHub Release `v1.0.0`.
+
+**Important evidence limit:** We did not attempt to merge a PR *while a failing status check was required*, so enforcement in that particular failure state was **not directly demonstrated**. The final PR was merged after the passing check and ruleset configuration.
+
+**Starting state for Phase 2:**
+
+```text
+v1.0.0 (published release) → a8174ae
+main / origin/main        → a8174ae  (last observed)
+Production deployment    → none; simulated baseline only
+```
+
+**Next exercises (NOT yet completed):** choose trunk-based vs GitFlow workflow; make unreleased commits on `main`; retain a `release/1.0` maintenance line from tagged commit `a8174ae`; apply urgent patch without including new features; use selective `cherry-pick`, backport and forward-port; publish simulated `v1.0.1`; explain CI/artifact provenance and rollbacks.
+
+**Learning process:** Always announce **Do / Don't / Stop at** *before* commands. After exercises, inspect outputs, clear doubts, then advance only when the learner explicitly confirms readiness. No MCQ option preselected.
