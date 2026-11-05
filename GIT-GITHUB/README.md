@@ -826,3 +826,40 @@ Production deployment    → none; simulated baseline only
 **Next exercises (NOT yet completed):** choose trunk-based vs GitFlow workflow; make unreleased commits on `main`; retain a `release/1.0` maintenance line from tagged commit `a8174ae`; apply urgent patch without including new features; use selective `cherry-pick`, backport and forward-port; publish simulated `v1.0.1`; explain CI/artifact provenance and rollbacks.
 
 **Learning process:** Always announce **Do / Don't / Stop at** *before* commands. After exercises, inspect outputs, clear doubts, then advance only when the learner explicitly confirms readiness. No MCQ option preselected.
+# README.md update — paste into GIT-GITHUB/README.md
+
+The existing `README.md` includes detailed Phase 1 notes. Preserve them. Add the following near the top, after the title/introduction, and update the old progress and date lines.
+
+## Replacement progress header
+
+```markdown
+> **Learning notes and hands-on lab journal**
+> **Progress:** Phase 1 (Essentials) Lessons 1–10 complete; Phase 2 (Intermediate) exercises through Lesson 13 complete (release/hotfix, cherry-pick, merge/rebase, force-with-lease, conflicts, `.gitignore`, stash). Phase 3 pending.
+> **Last updated:** 5 November 2026
+> **Phase 2 journal:** [PHASE-2.md](PHASE-2.md)
+> **Separate from:** `GITHUB-COPILOT/README.md`
+```
+
+## New section for README (add just after the introductory paragraphs)
+
+```markdown
+## Phase 2 — Intermediate: latest hands-on notes
+
+**[Read the Phase 2 learning journal →](PHASE-2.md)**
+
+Completed in the `git-enterprise-lab` sandbox:
+
+- Simulated release maintenance line `release/1.0` from `v1.0.0`, patch release `v1.0.1`, GitHub PR #4/#5 and maintenance CI/ruleset.
+- Forward-port PAY-301 with `git cherry-pick -x`, then PR #6 to `main`.
+- Compare merge and rebase histories and resulting trees; test non-fast-forward rejection and `--force-with-lease` under competing updates.
+- Resolve both merge and rebase conflicts; inspect index stages and ours/theirs semantics.
+- Handle IntelliJ metadata via `.git/info/exclude`, and practise Git stash including `-u`, `apply`/`pop`/`drop`, `--keep-index`, `--staged` and `--index`.
+
+**Last verified local checkpoint (5 Nov 2026):** `lab/stash-practise` clean, with one older IntelliJ stash intentionally preserved. Next topic: safe recovery and `reflog`. No app artifact or production deployment was created.
+
+*The historical Phase 1 checkpoints below describe their states at the time of those lessons; consult this Phase 2 journal for current progress.*
+```
+
+## Old checkpoint notes
+
+The original `README.md` still contains historical text such as “Phase 2 is next” and “cherry-pick hotfixes remain future exercises.” Those are accurate as dated Phase 1 snapshots, but not current status. Either mark such sections as **Historical checkpoint (30 October 2026)** or point readers to the new Phase 2 section. Do not delete the recorded Phase 1 evidence.
