@@ -61,3 +61,21 @@ __pycache__/
 !.env.example
 chroma_data/
 .idea/
+# Credentials and local environment
+.env
+.env.*
+!.env.example
+.aws/
+**/.aws/
+*.pem
+*.key
+*.p12
+*.pfx
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# Build output / local logs
+**/target/
+**/build/
+*.log
